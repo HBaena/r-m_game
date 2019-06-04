@@ -91,7 +91,11 @@ class Level:
                                      self.player.bounding.width + 20,
                                      self.player.bounding.height + 20), 0)
 
-        RefreshScreen(self.screen, [self.player] + self.blocks + self.objects)
+        RefreshScreen(self.screen, [self.player] + self.blocks)
+        for obj in self.objects:
+            if obj.is_visible():
+                self.screen.blit(obj.asset, obj.bounding)
+
         screen.blit(self.label, (10, 10))
         i = 0
         while i < int(self.player.lifes):
@@ -121,7 +125,8 @@ if __name__ == "__main__":
     # render text
     label = myfont.render("Level 1", 1, (0, 0, 0))
     level = Level(screen=screen, background=background, player=player_morty,
-                  blocks=levels.LEVEL_1_BLOCKS + levels.LEVEL_1_FLOOR, objects=levels.LEVEL_1_OBJECTS, label=label)
+                  blocks=list(levels.LEVEL_1_BLOCKS + levels.LEVEL_1_FLOOR), objects=levels.LEVEL_1_OBJECTS,
+                  label=label)
     screen.fill([255, 255, 255])
     # screen.blit(background.image, background.rect)
 

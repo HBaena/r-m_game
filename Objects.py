@@ -44,6 +44,10 @@ class Object():
         self.bounding = self.asset.get_rect()
         self.bounding.x, self.bounding.y = position.x, position.y
         self.collisions = Collisions()
+        self.visible = True
+
+    def is_visible(self):
+        return self.visible
 
     def set_name(self, name):
         self.name = name
@@ -272,10 +276,10 @@ class Player(Character):
             print('Next level')
         elif obtainable.name is 'spike':
             print("Spike")
-            self.lifes  -= 1
+            self.lifes -= 1
             self.is_alive()
-            del obtainable
-            pass
+            obtainable.visible = False
+
 
     def is_colliding(self, obj):
         print("is_colliding: Player")
@@ -462,7 +466,6 @@ class Player(Character):
                 # obj = Obtainable([], "s", "")
                 print("Is", obj.name)
                 self.get_obtainable(obj)
-
 
         # state 0 (stopped) (first state)
         if (
