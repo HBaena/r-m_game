@@ -1,0 +1,7 @@
+speed x
+max jump
+delay jump
+weight
+resistence
+run percent
+bottom_tolerance
