@@ -15,6 +15,7 @@ PLAYER_SCALE = 0.5
 GRAVITY = 2
 JUMP_STAY = 10
 MAX_LIFES = 10
+MAX_ENERGY = 10
 BOTTOM_TOLERANCE = 4
 
 
@@ -85,6 +86,47 @@ class Obtainable(Object):
 
     def active_action(self, player):
         player.obtainable_action(self.name)
+
+
+class Battery(Obtainable):
+    def __init__(self, position, asset, charge):
+        self.charge = charge
+        Obtainable.__init__(self, position, asset, 'battery')
+        self.state = 1
+        self.delay = 70
+
+class SuperBattery(Object):
+
+    def __init__(self, position):
+        asset = 'sprites/others/battery_super_1.png'
+        Battery.__init__(self, position, asset, 2)
+
+    def change_state(self):
+        if self.state == 0:
+            self.set_asset('sprites/others/battery_super_1.png')
+        elif self.state == self.delay:
+            self.set_asset('sprites/others/battery_super_2.png')
+
+        self.state += 1
+        if self.state == self.delay * 2:
+            self.state = 0
+
+
+class NormalBattery(Battery):
+
+    def __init__(self, position):
+        asset = 'sprites/others/battery_normal_1.png'
+        Battery.__init__(self, position, asset,1)
+
+    def change_state(self):
+        if self.state == 0:
+            self.set_asset('sprites/others/battery_normal_1.png')
+        elif self.state == self.delay:
+            self.set_asset('sprites/others/battery_normal_2.png')
+
+        self.state += 1
+        if self.state == self.delay * 2:
+            self.state = 0
 
 
 class Block(Object):
@@ -258,6 +300,7 @@ class Player(Character):
         self.state_y = 0
         # temp variables
         self.__key_jump = 0
+        self.energy = MAX_ENERGY
 
     def attacked(self, enemy):
         print('Attacked')
@@ -279,7 +322,6 @@ class Player(Character):
             self.lifes -= 1
             self.is_alive()
             obtainable.visible = False
-
 
     def is_colliding(self, obj):
         print("is_colliding: Player")
@@ -465,7 +507,8 @@ class Player(Character):
             for obj in objs:
                 # obj = Obtainable([], "s", "")
                 print("Is", obj.name)
-                self.get_obtainable(obj)
+                if obj.is_visible():
+                    self.get_obtainable(obj)
 
         # state 0 (stopped) (first state)
         if (

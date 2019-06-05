@@ -1,6 +1,7 @@
-from Objects import Block, BLOCK_SIZE, Obtainable
+from Objects import Block, BLOCK_SIZE, Obtainable, Battery, SuperBattery, NormalBattery
 from Miscellaneous import Coord
 import pygame
+
 size = width, height = 1080, 655
 pygame.init()
 
@@ -27,5 +28,7 @@ LEVEL_1_BLOCKS.append(Block(Coord(700, 630, 0), 'brick'))
 LEVEL_1_BLOCKS.append(Block(Coord(700, 570, 0), 'brick'))
 
 LEVEL_1_OBJECTS.append(Obtainable(Coord(500, height - 100, 0), 'sprites/block/spikes.png', name="spike"))
+# LEVEL_1_OBJECTS.append(Battery(position=Coord(800, height - 100, 0), charge=1))
+LEVEL_1_OBJECTS.append(NormalBattery(position=Coord(800, height - 100, 0)))
 
 del x

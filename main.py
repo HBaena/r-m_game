@@ -6,6 +6,7 @@ from Objects import Player, MAX_LIFES
 from Miscellaneous import Coord
 from Objects import Block, Obtainable
 
+BACKGROUND = [255, 255, 255]
 BLOCK_SIZE = 30
 PLAYER_SCALE = 0.5
 K_SPACE = 6
@@ -86,17 +87,26 @@ class Level:
     def refresh_screen(self):
         # RefreshBackground(self.screen, self.background)
         # self.screen.fill([0, 0, 0])
-        pygame.draw.rect(self.screen, [255, 255, 255],
+        pygame.draw.rect(self.screen, BACKGROUND,
                          pygame.Rect(self.player.bounding.x - 10, self.player.bounding.y - 10,
                                      self.player.bounding.width + 20,
                                      self.player.bounding.height + 20), 0)
 
-        RefreshScreen(self.screen, [self.player] + self.blocks)
         for obj in self.objects:
             if obj.is_visible():
+                if obj.name == 'battery':
+                    pygame.draw.rect(self.screen, BACKGROUND, (obj.bounding.x - 10, obj.bounding.y - 10,
+                                     obj.bounding.width + 20,
+                                     obj.bounding.height + 20), 0)
+                    obj.change_state()
                 self.screen.blit(obj.asset, obj.bounding)
+            else:
+                pygame.draw.rect(self.screen, BACKGROUND, obj.bounding, 0)
 
+        RefreshScreen(self.screen, [self.player] + self.blocks)
         screen.blit(self.label, (10, 10))
+
+        # Drawing hearts
         i = 0
         while i < int(self.player.lifes):
             screen.blit(pygame.image.load("sprites/others/heart_2.png"), (200 + i * 30, 10))
@@ -127,7 +137,7 @@ if __name__ == "__main__":
     level = Level(screen=screen, background=background, player=player_morty,
                   blocks=list(levels.LEVEL_1_BLOCKS + levels.LEVEL_1_FLOOR), objects=levels.LEVEL_1_OBJECTS,
                   label=label)
-    screen.fill([255, 255, 255])
+    screen.fill(BACKGROUND)
     # screen.blit(background.image, background.rect)
 
     while 1:
