@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Rick & morty game
+Exec=main.py
+Icon=icon.png
+Terminal=true
+Name[es_MX]=ryckandmorty.desktop
