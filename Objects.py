@@ -116,9 +116,14 @@ class Portal(Obtainable):
         Obtainable.__init__(self, position, asset)
         self.name = 'portal'
         self.state = 1
-        self.portal_state = 'open'
+        self.portal_state = 'off'
         self.count = 1
         self.delay = 10
+
+    def open(self):
+        self.portal_state = 'open'
+        self.count = 1
+        self.state = 1
 
     def refresh(self):
         if not self.count % self.delay:
@@ -151,6 +156,32 @@ class Portal(Obtainable):
         self.count += 1
 
 
+class Harmful(Obtainable):
+    def __init__(self, position, asset, damage):
+        self.damage = damage
+        Obtainable.__init__(self, position, asset, 'harmful')
+        self.state = 1
+        self.delay = 70
+
+
+class Spike(Harmful):
+    def __init__(self, position):
+        asset = 'sprites/block/spikes.png'
+        Harmful.__init__(self, position, asset, 0.5)
+
+
+class BacteriumNormal(Harmful):
+    def __init__(self, position):
+        asset = 'sprites/others/bacterium_normal.png'
+        Harmful.__init__(self, position, asset, 1)
+
+
+class BacteriumMutant(Harmful):
+    def __init__(self, position):
+        asset = 'sprites/others/bacterium_mutant.png'
+        Harmful.__init__(self, position, asset, 2)
+
+
 class Battery(Obtainable):
     def __init__(self, position, asset, charge):
         self.charge = charge
@@ -159,7 +190,7 @@ class Battery(Obtainable):
         self.delay = 70
 
 
-class SuperBattery(Object):
+class SuperBattery(Battery):
 
     def __init__(self, position):
         asset = 'sprites/others/battery_super_1.png'
@@ -384,9 +415,9 @@ class Player(Character):
                 obtainable.count = 1
                 obtainable.portal_state = 'close'
 
-        elif obtainable.name is 'spike':
+        elif obtainable.name is 'harmful':
             print("Spike")
-            self.lifes -= 1
+            self.lifes -= obtainable.damage
             self.is_alive()
             obtainable.visible = False
         elif obtainable.name is 'battery':

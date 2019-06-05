@@ -79,12 +79,14 @@ class Level:
             if obj.name == 'portal':
                 self.portal = obj
                 break
-        self.portal.portal_state = 'off'
 
     def run(self, keys):
         # if the energy is full open the portal
+
         if self.player.energy == MAX_ENERGY:
-            self.portal.portal_state = 'open'
+            if self.portal.portal_state == 'off':
+                self.portal.open()
+
         self.change_movement(keys)
         self.refresh_screen()
 
@@ -171,7 +173,6 @@ if __name__ == "__main__":
         name = argv[1]
     player_morty = Player(name,
                           Coord(100, 0, 0), [8, 0], 30, 10, 2, 2, 50)
-    player_morty.lifes = 3.5
     player_morty.energy = 0
     myfont = pygame.font.SysFont("monospace bold", 40)
     # render text
