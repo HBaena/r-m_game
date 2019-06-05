@@ -8,8 +8,9 @@
     <property name="can_focus">False</property>
     <property name="column_homogeneous">True</property>
     <child>
-      <object class="GtkButton">
+      <object class="GtkButton" id="button_morty">
         <property name="label" translatable="yes">Morty</property>
+        <property name="name">morty</property>
         <property name="visible">True</property>
         <property name="can_focus">True</property>
         <property name="receives_default">True</property>
@@ -25,8 +26,9 @@
       </packing>
     </child>
     <child>
-      <object class="GtkButton">
+      <object class="GtkButton" id="button_rick">
         <property name="label" translatable="yes">Rick</property>
+        <property name="name">rick</property>
         <property name="visible">True</property>
         <property name="can_focus">True</property>
         <property name="receives_default">True</property>
@@ -42,8 +44,9 @@
       </packing>
     </child>
     <child>
-      <object class="GtkButton">
+      <object class="GtkButton" id="button_summer">
         <property name="label" translatable="yes">Summer</property>
+        <property name="name">summer</property>
         <property name="visible">True</property>
         <property name="can_focus">True</property>
         <property name="receives_default">True</property>
@@ -92,8 +95,9 @@
       </packing>
     </child>
     <child>
-      <object class="GtkButton">
+      <object class="GtkButton" id="button_jerry">
         <property name="label" translatable="yes">Jerry</property>
+        <property name="name">jerry</property>
         <property name="visible">True</property>
         <property name="can_focus">True</property>
         <property name="receives_default">True</property>

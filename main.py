@@ -2,11 +2,12 @@ import pygame
 import sys
 import threading
 import levels
-from Objects import Player, MAX_LIFES
+from Objects import Player, MAX_LIFES, MAX_ENERGY
 from Miscellaneous import Coord
+from sys import argv
 from Objects import Block, Obtainable
 
-BACKGROUND = [255, 255, 255]
+BACKGROUND = [0, 0, 0]
 BLOCK_SIZE = 30
 PLAYER_SCALE = 0.5
 K_SPACE = 6
@@ -73,8 +74,17 @@ class Level:
         self.background = background
         self.player = player
         self.tmp = None
+        self.portal = None
+        for obj in self.objects:
+            if obj.name == 'portal':
+                self.portal = obj
+                break
+        self.portal.portal_state = 'off'
 
     def run(self, keys):
+        # if the energy is full open the portal
+        if self.player.energy == MAX_ENERGY:
+            self.portal.portal_state = 'open'
         self.change_movement(keys)
         self.refresh_screen()
 
@@ -87,50 +97,82 @@ class Level:
     def refresh_screen(self):
         # RefreshBackground(self.screen, self.background)
         # self.screen.fill([0, 0, 0])
+        # Erease player for refresh
         pygame.draw.rect(self.screen, BACKGROUND,
-                         pygame.Rect(self.player.bounding.x - 10, self.player.bounding.y - 10,
-                                     self.player.bounding.width + 20,
-                                     self.player.bounding.height + 20), 0)
+                         pygame.Rect(self.player.bounding.x - 50, self.player.bounding.y - 50,
+                                     self.player.bounding.width + 80,
+                                     self.player.bounding.height + 80), 0)
 
+        # Refreshin objects
         for obj in self.objects:
+            # if it is visible
             if obj.is_visible():
-                if obj.name == 'battery':
+                # if is it a battery
+                if obj.name == 'battery' or obj.name == 'portal':
+                    # remove asset for new asset bigger or smaller
                     pygame.draw.rect(self.screen, BACKGROUND, (obj.bounding.x - 10, obj.bounding.y - 10,
-                                     obj.bounding.width + 20,
-                                     obj.bounding.height + 20), 0)
-                    obj.change_state()
-                self.screen.blit(obj.asset, obj.bounding)
-            else:
-                pygame.draw.rect(self.screen, BACKGROUND, obj.bounding, 0)
+                                                               obj.bounding.width + 20,
+                                                               obj.bounding.height + 20), 0)
+                    obj.refresh()
+                elif obj.name == 'saw':
+                    pygame.draw.rect(self.screen, BACKGROUND, (obj.bounding.x - 10, obj.bounding.y - 10,
+                                                               obj.bounding.width + 20,
+                                                               obj.bounding.height + 20), 0)
+                    obj.rotate()
 
+                # refresh object
+                self.screen.blit(obj.asset, obj.bounding)
+
+            else:
+                # if it is not visible hidde
+                pygame.draw.rect(self.screen, BACKGROUND, obj.bounding, 0)
+        # refresshing player and blocks
         RefreshScreen(self.screen, [self.player] + self.blocks)
-        screen.blit(self.label, (10, 10))
+        # Print label (lavel #)
+        screen.blit(self.label, (10, 15))
 
         # Drawing hearts
         i = 0
         while i < int(self.player.lifes):
-            screen.blit(pygame.image.load("sprites/others/heart_2.png"), (200 + i * 30, 10))
+            self.screen.blit(pygame.image.load("sprites/others/heart_2.png"), (200 + i * 30, 15))
             i += 1
         if self.player.lifes - int(self.player.lifes) > 0:
-            screen.blit(pygame.image.load("sprites/others/heart_1.png"), (200 + i * 30, 10))
+            self.screen.blit(pygame.image.load("sprites/others/heart_1.png"), (200 + i * 30, 15))
             i += 1
         while i < MAX_LIFES:
-            screen.blit(pygame.image.load("sprites/others/heart_0.png"), (200 + i * 30, 10))
+            self.screen.blit(pygame.image.load("sprites/others/heart_0.png"), (200 + i * 30, 15))
+            i += 1
+
+        # drawing power level
+        self.screen.blit(pygame.image.load("sprites/others/portal_gun.png"), (600, 5))
+        i = 0
+        while i < self.player.energy:
+            pygame.draw.rect(self.screen, (0, 255, 64), (680 + i * 15, 15, 10, 30), 0)
+            i += 1
+        while i < MAX_ENERGY:
+            pygame.draw.rect(self.screen, (0, 255, 64), (680 + i * 15, 15, 10, 30), 1)
             i += 1
 
 
 if __name__ == "__main__":
     # size of the window
-    size = width, height = 1080, 655
+    size = width, height = 1480, 700
     speed = [1, 0]
     keys = []
     # background = pygame.image.load('sprites/scenes/scene_02.jpg').convert_alpha()
     screen = pygame.display.set_mode(size)
-
+    # icon
+    icon = pygame.image.load('icon.png')
+    pygame.display.set_icon(icon)
     background = Background('sprites/scenes/scene_02.jpg', [0, 0])
-    player_morty = Player("morty",
+    if len(argv) == 1:
+        name = 'morty'
+    else:
+        name = argv[1]
+    player_morty = Player(name,
                           Coord(100, 0, 0), [8, 0], 30, 10, 2, 2, 50)
     player_morty.lifes = 3.5
+    player_morty.energy = 0
     myfont = pygame.font.SysFont("monospace bold", 40)
     # render text
     label = myfont.render("Level 1", 1, (0, 0, 0))
@@ -149,4 +191,4 @@ if __name__ == "__main__":
         level.run(keys)
         # update display
         pygame.display.update()
-        pygame.display.flip()
+        # pygame.display.flip()

@@ -76,6 +76,27 @@ class Object():
         print("is_colliding")
 
 
+class Saw(Object):
+    def __init__(self, position):
+        asset_name = 'sprites/others/saw_1.png'
+        Object.__init__(self, asset_name, position)
+        self.name = 'saw'
+        self.state = 1
+        self.count = 0
+        self.delay = 20
+
+    def rotate(self):
+        if not self.count % self.delay:
+            print("Rotate: ", self.state)
+            asset = 'sprites/others/saw_' + str(self.state) + '.png'
+            self.asset = pygame.image.load(asset)
+            if self.state == 4:
+                self.state = 0
+            self.state += 1
+
+        self.count += 1
+
+
 class Obtainable(Object):
     """docstring for Obtainable"""
 
@@ -88,6 +109,48 @@ class Obtainable(Object):
         player.obtainable_action(self.name)
 
 
+class Portal(Obtainable):
+
+    def __init__(self, position):
+        asset = 'sprites/portal/portal_open/portal_open_1.png'
+        Obtainable.__init__(self, position, asset)
+        self.name = 'portal'
+        self.state = 1
+        self.portal_state = 'open'
+        self.count = 1
+        self.delay = 10
+
+    def refresh(self):
+        if not self.count % self.delay:
+            if self.portal_state == 'open':
+                self.set_asset('sprites/portal/portal_open/portal_open_' + str(int(self.count / self.delay)) + '.png')
+                if self.state != 32:
+                    self.state += 1
+                else:
+                    self.portal_state = 'running'
+                    self.state = 1
+                    self.count = 1
+
+            elif self.portal_state == 'running':
+                self.set_asset('sprites/portal/portal_running/portal_' + str(int(self.count / self.delay)) + '.png')
+                if self.state != 31:
+                    self.state += 1
+                else:
+                    self.count = 1
+                    self.state = 2
+            elif self.portal_state == 'close':
+                self.set_asset('sprites/portal/portal_close/portal_close_' + str(int(self.count / self.delay)) + '.png')
+                if self.state != 32:
+                    self.state += 1
+                else:
+                    self.count = 1
+                    self.state = 1
+                    self.visible = False
+                    self.portal_state = 'closed'
+
+        self.count += 1
+
+
 class Battery(Obtainable):
     def __init__(self, position, asset, charge):
         self.charge = charge
@@ -95,13 +158,14 @@ class Battery(Obtainable):
         self.state = 1
         self.delay = 70
 
+
 class SuperBattery(Object):
 
     def __init__(self, position):
         asset = 'sprites/others/battery_super_1.png'
         Battery.__init__(self, position, asset, 2)
 
-    def change_state(self):
+    def refresh(self):
         if self.state == 0:
             self.set_asset('sprites/others/battery_super_1.png')
         elif self.state == self.delay:
@@ -116,9 +180,9 @@ class NormalBattery(Battery):
 
     def __init__(self, position):
         asset = 'sprites/others/battery_normal_1.png'
-        Battery.__init__(self, position, asset,1)
+        Battery.__init__(self, position, asset, 1)
 
-    def change_state(self):
+    def refresh(self):
         if self.state == 0:
             self.set_asset('sprites/others/battery_normal_1.png')
         elif self.state == self.delay:
@@ -300,27 +364,33 @@ class Player(Character):
         self.state_y = 0
         # temp variables
         self.__key_jump = 0
-        self.energy = MAX_ENERGY
+        self.energy = 0
 
     def attacked(self, enemy):
         print('Attacked')
         self.lifes -= enemy.power
 
     def get_obtainable(self, obtainable):
-
         if obtainable.name is 'life':
             print('Incrementing lifes')
             self.lifes += 1
             if self.lifes > MAX_LIFES:
                 self.lifes = MAX_LIFES
-        elif obtainable.name is 'key':
-            self.key = True
-        elif obtainable.name is 'portal':  # obtainable.name is 'portal'
-            print('Next level')
+        elif obtainable.name is 'portal':
+            if obtainable.portal_state is not 'off':
+                return
+            if obtainable.portal_state is not 'close':
+                obtainable.state = 1
+                obtainable.count = 1
+                obtainable.portal_state = 'close'
+
         elif obtainable.name is 'spike':
             print("Spike")
             self.lifes -= 1
             self.is_alive()
+            obtainable.visible = False
+        elif obtainable.name is 'battery':
+            self.energy += obtainable.charge
             obtainable.visible = False
 
     def is_colliding(self, obj):
