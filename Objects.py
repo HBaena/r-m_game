@@ -310,7 +310,7 @@ class Character(Object):
         self.count_delay_y = DELAY_Y
 
     def is_alive(self):
-        if self.lifes < 0:
+        if self.lifes <= 0:
             print('Dead')
             return False
         else:
@@ -440,16 +440,20 @@ class Player(Character):
         if obtainable.name is 'portal':
             if obtainable.portal_state is 'off':
                 return
-            if obtainable.portal_state is not 'close':
+
+            if obtainable.portal_state is 'running':
                 obtainable.state = 1
                 obtainable.count = 1
                 obtainable.portal_state = 'close'
+
         elif obtainable.name is 'harmful':
             self.lifes -= obtainable.damage
             self.is_alive()
             obtainable.visible = False
         elif obtainable.name is 'battery':
             self.energy += obtainable.charge
+            if self.energy > MAX_ENERGY:
+                self.energy = MAX_ENERGY
             obtainable.visible = False
         elif obtainable.name is 'enhancer':
             self.max_jump += obtainable.jump

@@ -11,6 +11,8 @@ pygame.init()
 '''
     LEVEL 1 Objects
 '''
+LEVELS = []
+
 LEVEL_1_FLOOR = []
 LEVEL_1_BLOCKS = []
 LEVEL_1_OBJECTS = []
@@ -41,6 +43,8 @@ LEVEL_1_OBJECTS.append(PlusJump(position=Coord(950, height - 100, 0)))
 LEVEL_1_OBJECTS.append(DarkBall(position=Coord(950, height - 100, 0)))
 # LEVEL_1_OBJECTS.append(Saw(position=Coord(800, height - 100, 0)))
 LEVEL_1_OBJECTS.append(Portal(position=Coord(1200, height - 180, 0)))
+
+LEVELS.append([LEVEL_1_BLOCKS + LEVEL_1_FLOOR, LEVEL_1_OBJECTS])
 
 del x
 LEVEL_2_FLOOR = []

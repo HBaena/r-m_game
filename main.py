@@ -1,21 +1,26 @@
 import pygame
 import subprocess
 import sys
+import time
 import threading
-import levels
+from levels import LEVELS
 from Objects import Player, MAX_LIFES, MAX_ENERGY
 from Miscellaneous import Coord
 from sys import argv
 from Objects import Block, Obtainable
-
+size = width, height = 1360, 760
 BACKGROUND = [0, 0, 0]
 BLOCK_SIZE = 30
 PLAYER_SCALE = 0.5
 K_SPACE = 6
+K_ENTER = 7
+LEVEL_REBOOT = 2
+LEVEL_PASSED = 1
+LEVEL_RUNNING = 0
 
 USED_KEYS = [pygame.K_UP, pygame.K_DOWN, pygame.K_RIGHT,
              pygame.K_LEFT, pygame.K_RSHIFT, pygame.K_LSHIFT,
-             pygame.K_SPACE]
+             pygame.K_SPACE, pygame.K_RETURN]
 
 
 def listen_for_exit():
@@ -74,25 +79,59 @@ class Level:
         self.objects = objects
         self.background = background
         self.player = player
-        self.tmp = None
         self.portal = None
         for obj in self.objects:
             if obj.name == 'portal':
                 self.portal = obj
                 break
+        self.portal.portal_state = 'off'
+        # myfont = pygame.font.SysFont("roboto bold", 100)
+        # render text
+        self.tmp_01 = 0
+        self.tmp_02 = 0
 
     def run(self, keys):
-        # if the energy is full open the portal
+        # if the portal is closing it changes to next level
+        if self.portal.portal_state is 'close':
+            if keys[K_ENTER] == 1:
+                return LEVEL_PASSED
 
+            if self.tmp_01 == 0:
+                image = pygame.image.load('sprites/labels/next_level.png')
+                x = int(image.get_rect()[2])
+                y = int(image.get_rect()[3])
+                self.screen.blit(image, (int(width/2 - x/2), int(height/2 - y/2 - 100)))
+                self.tmp_01 = 1
+
+            return LEVEL_RUNNING
+
+        # if the energy is full open the portal
         if self.player.energy == MAX_ENERGY:
             if self.portal.portal_state == 'off':
                 self.portal.open()
 
+        # if player is death reboot level
+        
+        if not player.is_alive():
+            if self.tmp_02 == 0:
+                image = pygame.image.load('sprites/labels/death.png')
+                x = int(image.get_rect()[2])
+                y = int(image.get_rect()[3])
+                self.screen.blit(image, (int(width/2 - x/2), int(height/2 - y/2 - 100)))
+                self.tmp_02 = 1
+
+            if keys[K_ENTER] == 1:
+                del self.objects
+                del self.blocks
+                return LEVEL_REBOOT
+
+            return LEVEL_RUNNING
+
         self.change_movement(keys)
         self.refresh_screen()
+        return LEVEL_RUNNING
 
     def change_movement(self, keys):
-        self.tmp = self.player.bounding
         self.player.change_movement_y(keys[K_SPACE], self.blocks, 0, 0)
         SimpleThread(self.player.change_movement_x,
                      keys, 0, self.screen.get_width(), self.blocks, self.objects)
@@ -111,13 +150,19 @@ class Level:
             # if it is visible
             if obj.is_visible():
                 # if is it a battery
-                if obj.name == 'battery' or obj.name == 'portal':
+                if obj.name == 'battery':
                     # remove asset for new asset bigger or smaller
                     pygame.draw.rect(self.screen, BACKGROUND, (obj.bounding.x - 20, obj.bounding.y - 20,
                                                                obj.bounding.width + 30,
                                                                obj.bounding.height + 30), 0)
                     obj.refresh()
-# refresh object
+                elif obj.name is 'portal':
+                    pygame.draw.rect(self.screen, BACKGROUND, (obj.bounding.x - 50, obj.bounding.y - 50,
+                                                               obj.bounding.width + 50,
+                                                               obj.bounding.height + 50), 0)
+                    obj.refresh()
+
+                # refresh object
                 self.screen.blit(obj.asset, obj.bounding)
             else:
                 # if it is not visible hidde
@@ -129,7 +174,6 @@ class Level:
 
         # Drawing hearts
         i = 0
-        print("Lifes: ", self.player.lifes)
         while i < int(self.player.lifes):
             self.screen.blit(pygame.image.load("sprites/others/heart_2.png"), (200 + i * 30, 15))
             i += 1
@@ -152,10 +196,7 @@ class Level:
 
 
 if __name__ == "__main__":
-    # size of the window
-    size = width, height = 1360, 760
-
-    # size = width, height = 1480, 700
+    ''' PYGAME '''
     speed = [1, 0]
     keys = []
     # background = pygame.image.load('sprites/scenes/scene_02.jpg').convert_alpha()
@@ -164,33 +205,77 @@ if __name__ == "__main__":
     icon = pygame.image.load('icon.png')
     pygame.display.set_icon(icon)
     background = Background('sprites/scenes/scene_02.jpg', [0, 0])
+    ''' PYGAME '''
+
+    ''' PLAYER '''
     if len(argv) == 1:
         name = 'morty'
     else:
         name = argv[1]
     if name == 'morty':
-        player = levels.MORTY
+        player = Player('morty', Coord(100, 0, 0), [8, 0], 30, 10, 2, 2, 50)
     else:
         player = Player(name,
                         Coord(100, 0, 0), [8, 0], 30, 10, 2, 2, 50)
-
     player.energy = 8
+    player.lifes = 2
+    ''' PLAYER '''
+
+    ''' LABAEL '''
     myfont = pygame.font.SysFont("monospace bold", 40)
     # render text
     label = myfont.render("Level 1", 1, (0, 0, 0))
-    level = Level(screen=screen, background=background, player=player,
-                  blocks=list(levels.LEVEL_1_BLOCKS + levels.LEVEL_1_FLOOR), objects=levels.LEVEL_1_OBJECTS,
-                  label=label)
-    screen.fill(BACKGROUND)
-    # screen.blit(background.image, background.rect)
+    ''' LABAEL '''
 
+    ''' RUNING LEVELS'''
+    i = 0
+    while i < len(LEVELS):
+        level = Level(screen=screen, background=background, player=player,
+                      blocks=LEVELS[i][0].copy(), objects=LEVELS[i][1].copy(),
+                      label=label)
+        screen.fill(BACKGROUND)
+        # screen.blit(background.image, background.rect)
+        while 1:
+            # Listen for quit keybord binding
+            listen_for_exit()
+            # Getting pressed keys
+            keys = get_keys_clicked()
+            # running level
+            response = level.run(keys)
+            if response == LEVEL_PASSED:
+                break
+            elif response == LEVEL_REBOOT:
+                # Restart level
+                player = Player(name,
+                                Coord(100, 0, 0), [8, 0], 30, 10, 2, 2, 50)
+                player.lifes = MAX_LIFES
+                player.energy = 0
+                for obj in LEVELS[i][1]:
+                    obj.visible = True
+                i -= 1
+                break
+            
+            # update display
+            pygame.display.update()
+            # pygame.display.flip()
+        i += 1
+
+    ''' RUNING LEVELS'''
+
+
+    
+
+    ''' EXIT LABEL '''
+    screen.fill(BACKGROUND)
+    image = pygame.image.load('sprites/labels/end_game.png')
+    x = int(image.get_rect()[2])
+    y = int(image.get_rect()[3])
+    screen.blit(image, (int(width/2 - x/2), int(height/2 - y/2 - 100)))
+    pygame.display.update()
+    ''' EXIT LABEL '''
+
+    ''' END GAME '''
     while 1:
-        # Listen for quit keybord binding
         listen_for_exit()
-        # Getting pressed keys
-        keys = get_keys_clicked()
-        # running level
-        level.run(keys)
-        # update display
-        pygame.display.update()
-        # pygame.display.flip()
+
+    ''' END GAME '''
