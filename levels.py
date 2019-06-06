@@ -1,4 +1,4 @@
-from Objects import Block, BLOCK_SIZE, SuperBattery, NormalBattery, Saw, Portal, BacteriumNormal, BacteriumMutant, \
+from Objects import Block, BLOCK_SIZE, SuperBattery, NormalBattery, Portal, BacteriumNormal, BacteriumMutant, \
     Spike, PlusHealth, PlusJump, PlusSpeed, DarkBall, Player
 from Miscellaneous import Coord
 # from main import  width, height

@@ -76,27 +76,6 @@ class Object():
         print("is_colliding")
 
 
-class Saw(Object):
-    def __init__(self, position):
-        asset_name = 'sprites/others/saw_1.png'
-        Object.__init__(self, asset_name, position)
-        self.name = 'saw'
-        self.state = 1
-        self.count = 0
-        self.delay = 20
-
-    def rotate(self):
-        if not self.count % self.delay:
-            print("Rotate: ", self.state)
-            asset = 'sprites/others/saw_' + str(self.state) + '.png'
-            self.asset = pygame.image.load(asset)
-            if self.state == 4:
-                self.state = 0
-            self.state += 1
-
-        self.count += 1
-
-
 class Obtainable(Object):
     """docstring for Obtainable"""
 
@@ -271,19 +250,6 @@ class Block(Object):
         self.__str__ = 'block'
         # Spikes
         self.edge = None
-
-
-class Sprike(Object):
-    """docstring for Sprike"""
-
-    def __init__(self, position, asset):
-        print("Init: Sprike")
-        self.asset_name = 'sprites/block/' + asset + '.png'
-        super(Sprike, self).__init__(self.asset_name, position)
-        self.asset = pygame.transform.scale(
-            self.asset, (BLOCK_SIZE, BLOCK_SIZE))
-        self.__str__ = 'sprike'
-        # Spikes
 
 
 class Character(Object):
