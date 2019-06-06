@@ -109,6 +109,14 @@ class Obtainable(Object):
         player.obtainable_action(self.name)
 
 
+class DarkBall(Obtainable):
+    def __init__(self, position):
+        asset = 'sprites/others/dark_ball.png'
+        Obtainable.__init__(self, position, asset)
+        self.name = 'dark_ball'
+        self.obtained = False
+
+
 class Portal(Obtainable):
 
     def __init__(self, position):
@@ -452,6 +460,9 @@ class Player(Character):
             if self.lifes > MAX_LIFES:
                 self.lifes = MAX_LIFES
             obtainable.visible = False
+        elif obtainable.name is 'dark_ball':
+            obtainable.visible = False
+            obtainable.obtained = True
 
     def is_colliding(self, obj):
         print("is_colliding: Player")
