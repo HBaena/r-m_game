@@ -1,4 +1,5 @@
-from Objects import Block, BLOCK_SIZE, Obtainable, Battery, SuperBattery, NormalBattery, Saw, Portal, BacteriumNormal, BacteriumMutant, Spike
+from Objects import Block, BLOCK_SIZE, Obtainable, Battery, SuperBattery, NormalBattery, Saw, Portal, BacteriumNormal, \
+    BacteriumMutant, Spike, PlusHealth, PlusJump, PlusSpeed
 from Miscellaneous import Coord
 # from main import  width, height
 import pygame
@@ -34,6 +35,9 @@ LEVEL_1_OBJECTS.append(BacteriumNormal(position=Coord(750, height - 100, 0)))
 LEVEL_1_OBJECTS.append(BacteriumMutant(position=Coord(650, height - 100, 0)))
 LEVEL_1_OBJECTS.append(NormalBattery(position=Coord(600, height - 100, 0)))
 LEVEL_1_OBJECTS.append(SuperBattery(position=Coord(800, height - 100, 0)))
+LEVEL_1_OBJECTS.append(PlusHealth(position=Coord(850, height - 100, 0)))
+LEVEL_1_OBJECTS.append(PlusSpeed(position=Coord(900, height - 100, 0)))
+LEVEL_1_OBJECTS.append(PlusJump(position=Coord(950, height - 100, 0)))
 # LEVEL_1_OBJECTS.append(Saw(position=Coord(800, height - 100, 0)))
 LEVEL_1_OBJECTS.append(Portal(position=Coord(1200, height - 180, 0)))
 

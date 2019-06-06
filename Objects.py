@@ -156,6 +156,34 @@ class Portal(Obtainable):
         self.count += 1
 
 
+class Enhancer(Obtainable):
+    def __init__(self, position, asset, speed=0, health=0, jump=0):
+        self.speed = speed
+        self.health = health
+        self.jump = jump
+        Obtainable.__init__(self, position, asset, 'enhancer')
+        self.state = 1
+        self.delay = 70
+
+
+class PlusJump(Enhancer):
+    def __init__(self, position):
+        asset = 'sprites/others/jump.png'
+        Enhancer.__init__(self, position, asset, jump=6)
+
+
+class PlusSpeed(Enhancer):
+    def __init__(self, position):
+        asset = 'sprites/others/speed.png'
+        Enhancer.__init__(self, position, asset, speed=4)
+
+
+class PlusHealth(Enhancer):
+    def __init__(self, position):
+        asset = 'sprites/others/health.png'
+        Enhancer.__init__(self, position, asset, health=1)
+
+
 class Harmful(Obtainable):
     def __init__(self, position, asset, damage):
         self.damage = damage
@@ -402,19 +430,13 @@ class Player(Character):
         self.lifes -= enemy.power
 
     def get_obtainable(self, obtainable):
-        if obtainable.name is 'life':
-            print('Incrementing lifes')
-            self.lifes += 1
-            if self.lifes > MAX_LIFES:
-                self.lifes = MAX_LIFES
-        elif obtainable.name is 'portal':
+        if obtainable.name is 'portal':
             if obtainable.portal_state is not 'off':
                 return
             if obtainable.portal_state is not 'close':
                 obtainable.state = 1
                 obtainable.count = 1
                 obtainable.portal_state = 'close'
-
         elif obtainable.name is 'harmful':
             print("Spike")
             self.lifes -= obtainable.damage
@@ -422,6 +444,13 @@ class Player(Character):
             obtainable.visible = False
         elif obtainable.name is 'battery':
             self.energy += obtainable.charge
+            obtainable.visible = False
+        elif obtainable.name is 'enhancer':
+            self.max_jump += obtainable.jump
+            self.speed[0] += obtainable.speed
+            self.lifes += obtainable.health
+            if self.lifes > MAX_LIFES:
+                self.lifes = MAX_LIFES
             obtainable.visible = False
 
     def is_colliding(self, obj):
