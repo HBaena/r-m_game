@@ -14,7 +14,7 @@ BLOCK_SIZE = 30
 PLAYER_SCALE = 0.5
 GRAVITY = 2
 JUMP_STAY = 10
-MAX_LIFES = 10
+MAX_LIFES = 6.0
 MAX_ENERGY = 10
 BOTTOM_TOLERANCE = 4
 
@@ -158,7 +158,6 @@ class Portal(Obtainable):
                 else:
                     self.count = 1
                     self.state = 1
-                    self.visible = False
                     self.portal_state = 'closed'
 
         self.count += 1
@@ -439,14 +438,13 @@ class Player(Character):
 
     def get_obtainable(self, obtainable):
         if obtainable.name is 'portal':
-            if obtainable.portal_state is not 'off':
+            if obtainable.portal_state is 'off':
                 return
             if obtainable.portal_state is not 'close':
                 obtainable.state = 1
                 obtainable.count = 1
                 obtainable.portal_state = 'close'
         elif obtainable.name is 'harmful':
-            print("Spike")
             self.lifes -= obtainable.damage
             self.is_alive()
             obtainable.visible = False
@@ -723,7 +721,6 @@ class Player(Character):
                 rects, 'l', left_edge, right_edge)
             if self.collisions.rect_left is not None:
                 print(self.collisions.rect_left)
-                input()
             if edges is not None:
                 left_edge, right_edge = edges[0], edges[1]
             self.walk('l', left_edge, right_edge, rects)

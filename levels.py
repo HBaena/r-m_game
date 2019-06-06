@@ -1,11 +1,11 @@
-from Objects import Block, BLOCK_SIZE, Obtainable, Battery, SuperBattery, NormalBattery, Saw, Portal, BacteriumNormal, \
-    BacteriumMutant, Spike, PlusHealth, PlusJump, PlusSpeed, DarkBall
+from Objects import Block, BLOCK_SIZE, SuperBattery, NormalBattery, Saw, Portal, BacteriumNormal, BacteriumMutant, \
+    Spike, PlusHealth, PlusJump, PlusSpeed, DarkBall, Player
 from Miscellaneous import Coord
 # from main import  width, height
 import pygame
 
+MORTY = Player('morty', Coord(100, 0, 0), [8, 0], 30, 10, 2, 2, 50)
 size = width, height = 1480, 700
-
 pygame.init()
 
 '''
@@ -41,5 +41,31 @@ LEVEL_1_OBJECTS.append(PlusJump(position=Coord(950, height - 100, 0)))
 LEVEL_1_OBJECTS.append(DarkBall(position=Coord(950, height - 100, 0)))
 # LEVEL_1_OBJECTS.append(Saw(position=Coord(800, height - 100, 0)))
 LEVEL_1_OBJECTS.append(Portal(position=Coord(1200, height - 180, 0)))
+
+del x
+LEVEL_2_FLOOR = []
+LEVEL_2_BLOCKS = []
+LEVEL_2_OBJECTS = []
+x = 0
+while x < width:
+    LEVEL_2_FLOOR.append(Block(Coord(x, height - BLOCK_SIZE, 0), "ground"))
+    x += BLOCK_SIZE
+LEVEL_2_BLOCKS.append(Block(Coord(500, 540, 500), 'brick'))
+LEVEL_2_BLOCKS.append(Block(Coord(400, 500, 400), 'brick'))
+LEVEL_2_BLOCKS.append(Block(Coord(600, 500, 600), 'brick'))
+LEVEL_2_BLOCKS.append(Block(Coord(400, 360, 400), 'brick'))
+LEVEL_2_BLOCKS.append(Block(Coord(600, 360, 600), 'brick'))
+LEVEL_2_BLOCKS.append(Block(Coord(700, 440, 700), 'brick'))
+LEVEL_2_BLOCKS.append(Block(Coord(300, 440, 200), 'brick'))
+LEVEL_2_BLOCKS.append(Block(Coord(500, 300, 500), 'brick'))
+LEVEL_2_BLOCKS.append(Block(Coord(600, 230, 600), 'brick'))
+LEVEL_2_BLOCKS.append(Block(Coord(700, 160, 130), 'brick'))
+LEVEL_2_BLOCKS.append(Block(Coord(500, 160, 130), 'brick'))
+LEVEL_2_BLOCKS.append(Block(Coord(600, 100, 600), 'brick'))
+
+
+LEVEL_2_OBJECTS.append(Spike(Coord(500, height - 100, 0)))
+# LEVEL_1_OBJECTS.append(Battery(position=Coord(800, height - 100, 0), charge=1))
+LEVEL_2_OBJECTS.append(NormalBattery(position=Coord(800, height - 100, 0)))
 
 del x

@@ -1,4 +1,5 @@
 import pygame
+import subprocess
 import sys
 import threading
 import levels
@@ -112,19 +113,12 @@ class Level:
                 # if is it a battery
                 if obj.name == 'battery' or obj.name == 'portal':
                     # remove asset for new asset bigger or smaller
-                    pygame.draw.rect(self.screen, BACKGROUND, (obj.bounding.x - 10, obj.bounding.y - 10,
-                                                               obj.bounding.width + 20,
-                                                               obj.bounding.height + 20), 0)
+                    pygame.draw.rect(self.screen, BACKGROUND, (obj.bounding.x - 20, obj.bounding.y - 20,
+                                                               obj.bounding.width + 30,
+                                                               obj.bounding.height + 30), 0)
                     obj.refresh()
-                elif obj.name == 'saw':
-                    pygame.draw.rect(self.screen, BACKGROUND, (obj.bounding.x - 10, obj.bounding.y - 10,
-                                                               obj.bounding.width + 20,
-                                                               obj.bounding.height + 20), 0)
-                    obj.rotate()
-
-                # refresh object
+# refresh object
                 self.screen.blit(obj.asset, obj.bounding)
-
             else:
                 # if it is not visible hidde
                 pygame.draw.rect(self.screen, BACKGROUND, obj.bounding, 0)
@@ -135,6 +129,7 @@ class Level:
 
         # Drawing hearts
         i = 0
+        print("Lifes: ", self.player.lifes)
         while i < int(self.player.lifes):
             self.screen.blit(pygame.image.load("sprites/others/heart_2.png"), (200 + i * 30, 15))
             i += 1
@@ -158,7 +153,9 @@ class Level:
 
 if __name__ == "__main__":
     # size of the window
-    size = width, height = 1480, 700
+    size = width, height = 1360, 760
+
+    # size = width, height = 1480, 700
     speed = [1, 0]
     keys = []
     # background = pygame.image.load('sprites/scenes/scene_02.jpg').convert_alpha()
@@ -171,13 +168,17 @@ if __name__ == "__main__":
         name = 'morty'
     else:
         name = argv[1]
-    player_morty = Player(name,
-                          Coord(100, 0, 0), [8, 0], 30, 10, 2, 2, 50)
-    player_morty.energy = 0
+    if name == 'morty':
+        player = levels.MORTY
+    else:
+        player = Player(name,
+                        Coord(100, 0, 0), [8, 0], 30, 10, 2, 2, 50)
+
+    player.energy = 8
     myfont = pygame.font.SysFont("monospace bold", 40)
     # render text
     label = myfont.render("Level 1", 1, (0, 0, 0))
-    level = Level(screen=screen, background=background, player=player_morty,
+    level = Level(screen=screen, background=background, player=player,
                   blocks=list(levels.LEVEL_1_BLOCKS + levels.LEVEL_1_FLOOR), objects=levels.LEVEL_1_OBJECTS,
                   label=label)
     screen.fill(BACKGROUND)
