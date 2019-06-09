@@ -1,5 +1,5 @@
 import pygame
-
+from Miscellaneous import Coord
 K_UP = 0
 K_DOWN = 1
 K_RIGHT = 2
@@ -12,7 +12,7 @@ DELAY_X = 7
 DELAY_Y = 10
 BLOCK_SIZE = 30
 PLAYER_SCALE = 0.5
-GRAVITY = 2
+GRAVITY = 1
 JUMP_STAY = 10
 MAX_LIFES = 6.0
 MAX_ENERGY = 10
@@ -86,6 +86,75 @@ class Obtainable(Object):
 
     def active_action(self, player):
         player.obtainable_action(self.name)
+class Canon(Object):
+    """docstring for Canon"""
+    def __init__(self, position, direction, delay = 40):
+        if direction is 'r':
+            self.asset_name = 'sprites/canon/right_'
+            self.bullet_position = Coord(position.x, position.y + 20)
+        elif direction is 'l':
+            self.asset_name = 'sprites/canon/left_'
+            self.bullet_position = Coord(position.x, position.y + 20)
+        elif direction is 'u':
+            self.asset_name = 'sprites/canon/up_'
+        elif direction is 'd':
+            self.asset_name = 'sprites/canon/down_'
+
+
+        Object.__init__(self, self.asset_name + '0.png', position)
+        self.name = 'canon'
+        self.direction = direction
+        self.count = 0
+        self.delay = delay
+        self.shoots = []
+        self.state = 0
+
+    def shoot(self):
+        if not self.count % self.delay:            
+            self.state = int(not self.state)
+            self.set_asset(self.asset_name + str(self.state) + '.png') 
+
+        if not self.count % (self.delay*2):
+            self.shoots.append(Bullet(self.bullet_position, self.direction))
+        self.count += 1
+
+class Harmful(Obtainable):
+    def __init__(self, position, asset, damage):
+        self.damage = damage
+        Obtainable.__init__(self, position, asset, 'harmful')
+        self.state = 1
+        self.delay = 70
+
+class Bullet(Harmful):
+    def __init__(self, position, direction):
+        asset = 'sprites/canon/bullet.png'
+        Harmful.__init__(self, position, asset, 0.5)
+        self.speed = (2, 2)
+        if direction is 'r':
+            self.direction = (1, 0)
+        elif direction is 'l':
+            self.direction = (-1, 0)
+        elif direction is 'u':
+            self.direction = (0, 1)
+        elif direction is 'd':
+            self.direction = (0, -1)
+        self.count = 1
+        self.delay = 10
+
+    def refresh(self, screen, bgn):
+        if self.count % self.delay:
+            self.bounding.right += self.speed[0]*self.direction[0]
+            self.bounding.top += self.speed[1]*self.direction[1]
+            pygame.draw.rect(screen, bgn, (self.bounding.x - 20, self.bounding.y - 20,
+                                           self.bounding.width + 30,
+                                           self.bounding.height + 30), 0)
+            screen.blit(self.asset, self.bounding)
+
+        self.count += 1
+
+
+
+
 
 
 class DarkBall(Obtainable):
@@ -170,12 +239,6 @@ class PlusHealth(Enhancer):
         Enhancer.__init__(self, position, asset, health=1)
 
 
-class Harmful(Obtainable):
-    def __init__(self, position, asset, damage):
-        self.damage = damage
-        Obtainable.__init__(self, position, asset, 'harmful')
-        self.state = 1
-        self.delay = 70
 
 
 class Spike(Harmful):

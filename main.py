@@ -161,6 +161,21 @@ class Level:
                                                                obj.bounding.width + 50,
                                                                obj.bounding.height + 50), 0)
                     obj.refresh()
+                elif obj.name is 'canon':
+                    pygame.draw.rect(self.screen, BACKGROUND, (obj.bounding.x - 20, obj.bounding.y - 20,
+                                                               obj.bounding.width + 30,
+                                                               obj.bounding.height + 30), 0)
+                    obj.shoot()
+                    for bullet in obj.shoots:
+                        bullet.refresh(screen, BACKGROUND)
+                        if self.player.bounding.colliderect(bullet.bounding):
+                            self.player.get_obtainable(bullet)
+
+                            pygame.draw.rect(self.screen, BACKGROUND, (bullet.bounding.x - 20, bullet.bounding.y - 20,
+                                                                       bullet.bounding.width + 30,
+                                                                       bullet.bounding.height + 30), 0)
+                            del obj.shoots[obj.shoots.index(bullet)]
+
 
                 # refresh object
                 self.screen.blit(obj.asset, obj.bounding)
@@ -213,12 +228,12 @@ if __name__ == "__main__":
     else:
         name = argv[1]
     if name == 'morty':
-        player = Player('morty', Coord(100, 0, 0), [8, 0], 30, 10, 2, 2, 50)
+        player = Player('morty', Coord(100, 0, 0), [8, 0], 50, 10, 2, 2, 50)
     else:
         player = Player(name,
-                        Coord(100, 0, 0), [8, 0], 30, 10, 2, 2, 50)
+                        Coord(100, 0, 0), [8, 0], 50, 10, 2, 2, 50)
     player.energy = 8
-    player.lifes = 2
+    player.lifes = MAX_LIFES
     ''' PLAYER '''
 
     ''' LABAEL '''
@@ -230,10 +245,16 @@ if __name__ == "__main__":
     ''' RUNING LEVELS'''
     i = 0
     while i < len(LEVELS):
+        player = Player(name,
+                        Coord(100, 0, 0), [8, 0], 50, 10, 2, 2, 50)
+        player.lifes = MAX_LIFES
+        player.energy = 0
+        player.mx_jump = 15
         level = Level(screen=screen, background=background, player=player,
                       blocks=LEVELS[i][0].copy(), objects=LEVELS[i][1].copy(),
                       label=label)
         screen.fill(BACKGROUND)
+
         # screen.blit(background.image, background.rect)
         while 1:
             # Listen for quit keybord binding
@@ -246,10 +267,6 @@ if __name__ == "__main__":
                 break
             elif response == LEVEL_REBOOT:
                 # Restart level
-                player = Player(name,
-                                Coord(100, 0, 0), [8, 0], 30, 10, 2, 2, 50)
-                player.lifes = MAX_LIFES
-                player.energy = 0
                 for obj in LEVELS[i][1]:
                     obj.visible = True
                 i -= 1
